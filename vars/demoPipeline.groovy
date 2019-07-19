@@ -1,5 +1,5 @@
 def call(){
-	def config = pipelineConfig()
+	
 pipeline{
 
 	agent none
@@ -29,6 +29,8 @@ spec:
 				}
 			}
 			steps{
+				
+				def config = pipelineConfig()
 				
 				echo "Building application"
 				sh 'dotnet --version'
