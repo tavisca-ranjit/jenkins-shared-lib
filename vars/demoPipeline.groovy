@@ -37,7 +37,8 @@ spec:
 				echo "Building application"
 				sh 'dotnet --version'
 				
-				echo ${config}.key1
+				echo ${config}
+				echo ${config.key1}
 				sh '''
 				set +x -v
 				
