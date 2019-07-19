@@ -1,4 +1,4 @@
 def call() {
-  Map pipelineConfig = readJSON(file: "${WORKSPACE}/config.json")
+  Map pipelineConfig = readJSON(file: "./config.json")
   return pipelineConfig
 }
