@@ -32,6 +32,18 @@ spec:
 				echo "Building application"
 				sh 'dotnet --version'
 				echo config.key1
+				sh '''
+				set +x -v
+				
+				echo ${config.build.projectFile}
+				
+				#Restoring Packages
+				dotnet restore ./${config.build.projectFile} --source https://api.nuget.org/v3/index.json --source http://stage-packagegallery.tavisca.com/api/odata -v:q
+				
+				#Building Project
+				dotnet msbuild ./${config.build.projectFile} -p:Configuration=release -v:q
+		
+				'''
 				sh 'sleep 1'
 			}
 		}
@@ -39,7 +51,7 @@ spec:
 		stage('Docker build image'){
 			agent {
 				kubernetes {
-				  cloud 'kubernetes-qatstg'
+				  cloud 'kubernetes-qa'
 				  label 'dynamicslavek8sdockerbuild'
 				  defaultContainer 'dynamicslavedockerbuild'
 				  yaml """
