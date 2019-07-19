@@ -1,7 +1,10 @@
 def call(){
 	
 pipeline{
-
+	environment {
+		config = readJSON(file: "./config.json")
+	}
+	
 	agent none
 	
 	stages{
@@ -34,9 +37,7 @@ spec:
 				echo "Building application"
 				sh 'dotnet --version'
 				
-				Map config = readJSON(file: "./config.json")
-				
-				echo config.key1
+				echo ${config}.key1
 				sh '''
 				set +x -v
 				
