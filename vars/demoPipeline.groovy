@@ -1,4 +1,5 @@
-def call(Map config){
+def call(){
+	def config = pipelineConfig()
 pipeline{
 
 	agent none
