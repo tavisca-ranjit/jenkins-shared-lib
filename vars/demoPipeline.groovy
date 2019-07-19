@@ -28,9 +28,8 @@ spec:
 """
 				}
 			}
+			def config = pipelineConfig()
 			steps{
-				
-				def config = pipelineConfig()
 				
 				echo "Building application"
 				sh 'dotnet --version'
