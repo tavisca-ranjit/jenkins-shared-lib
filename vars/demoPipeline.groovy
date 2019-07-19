@@ -3,7 +3,7 @@ def call(){
 pipeline{
 
 	agent none
-
+	def config = pipelineConfig()
 	stages{
 		stage('Build'){
 		
@@ -28,7 +28,7 @@ spec:
 """
 				}
 			}
-			def config = pipelineConfig()
+			
 			steps{
 				
 				echo "Building application"
