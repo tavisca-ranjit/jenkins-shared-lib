@@ -1,88 +1,63 @@
 def call(){
-	
-pipeline{
-	environment {
-		config = readJSON(file: "./config.json")
-	}
-	
-	agent none
-	
-	stages{
-		stage('Build'){
-		
-			agent {
-				kubernetes {
-				  cloud 'kubernetes-qa'
-				  label 'dynamicslavek8sdotnetbuild'
-				  defaultContainer 'dynamicslavedotnetbuild'
-				  yaml """
-apiVersion: v1
-kind: Pod
-metadata:
-  labels:
-  podtype: jenkinsdynamimcslavedotnetbuild
-spec:
-  containers:
-  - name: dynamicslavedotnetbuild
-    image: mcr.microsoft.com/dotnet/core/sdk:2.1
-    command:
-    - cat
-    tty: true
-"""
-				}
-			}
-			
-			steps{
-				
-				echo "Building application"
-				sh 'dotnet --version'
-				
-				sh "echo ${config}"
-				sh "echo ${config.key1}"
-				sh '''
-				set +x -v
-				
-				echo ${config.build.projectFile}
-				
-				#Restoring Packages
-				dotnet restore ./${config.build.projectFile} --source https://api.nuget.org/v3/index.json --source http://stage-packagegallery.tavisca.com/api/odata -v:q
-				
-				#Building Project
-				dotnet msbuild ./${config.build.projectFile} -p:Configuration=release -v:q
-		
-				'''
-				sh 'sleep 1'
-			}
-		}
 
-		stage('Docker build image'){
-			agent {
-				kubernetes {
-				  cloud 'kubernetes-qa'
-				  label 'dynamicslavek8sdockerbuild'
-				  defaultContainer 'dynamicslavedockerbuild'
-				  yaml """
-apiVersion: v1
-kind: Pod
-metadata:
-  labels:
-  podtype: jenkinsdynamimcslavedockerbuild
-spec:
-  containers:
-  - name: dynamicslavedockerbuild
-    image: docker
-    command:
-    - cat
-    tty: true
-"""
-				}
-			}
-			steps{
-				sh 'docker --version'
-				echo config.key2
-				sh 'sleep 10'
-			}
-		}
-	}
+pipeline {
+
+   environment {
+		config = readYAML(file: "./pipeline.yaml")
+   }
+   agent any
+   
+   parameters{
+      choice(
+        name: 'Environment',
+        choices: "Refresh\nBuild\nQA\nStage\nProd",
+        description: 'Please select the pipeline action' 
+      )
+   }
+   
+   stages {
+      stage('Refresh pipeline') {
+        when {
+          expression { "${params.Environment}" == 'Refresh' }
+        }
+        steps {
+          echo "Pipeline refreshed"
+        }
+      }
+      stage('Build') {
+	    when {
+          expression { "${params.Environment}" == 'Build' }
+		  expression { "${params.Environment}" == 'QA'}
+        }
+         steps {
+            echo 'Building the application'
+			sh "dotnet build ${config.projectPath}"
+         }
+      }
+	  stage('QA') {
+	     when {
+		   expression { "${params.Environment}" == 'QA'}
+		 }
+         steps {
+            echo 'Deploying on QA'
+         }
+      }
+	  stage('Stage') {
+		when {
+			expression { "${params.Environment}" == 'Stage'}
+		 }
+         steps {
+            echo 'Deploying on Stage'
+         }
+      }
+	  stage('Prod') {
+	     when {
+		    expression { "${params.Environment}" == 'Prod'}
+		 }
+         steps {
+            echo 'Deploying on Prod'
+         }
+      }
+   }
 }
 }
