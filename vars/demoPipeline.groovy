@@ -3,7 +3,7 @@ def call(){
 pipeline {
 
    environment {
-		config = readYAML(file: "./pipeline.yaml")
+		config = readYaml(file: "./pipeline.yaml")
    }
    agent any
    
@@ -26,8 +26,10 @@ pipeline {
       }
       stage('Build') {
 	    when {
-          expression { "${params.Environment}" == 'Build' }
-		  expression { "${params.Environment}" == 'QA'}
+			 anyOf{
+          		expression { "${params.Environment}" == 'Build' }
+		  		expression { "${params.Environment}" == 'QA'}
+			 }
         }
          steps {
             echo 'Building the application'
