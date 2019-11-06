@@ -17,6 +17,7 @@ pipeline {
       stage('Refresh pipeline') {
         when {
           expression { "${params.Environment}" == 'Refresh' }
+		
         }
         steps {
           echo "Pipeline refreshed"
@@ -34,6 +35,7 @@ pipeline {
 				config = readYaml(file: "pipeline.yaml")
 			}
             echo 'Building the application'
+		sh "ls"
 			echo "building project ${config.projectPath}"
          }
       }
