@@ -1,11 +1,9 @@
 def call(){
-
 pipeline {
-
-   environment {
-		config = readYaml(file: "./pipeline.yaml")
-   }
-   agent any
+   options{
+      buildDiscarder(logRotator(numToKeepStr: '2', artifactNumToKeepStr: '2'))
+    }
+   agent { label 'master' }
    
    parameters{
       choice(
@@ -31,9 +29,12 @@ pipeline {
 		  		expression { "${params.Environment}" == 'QA'}
 			 }
         }
-         steps {
+        steps {
+			script{            
+				config = readYaml(file: "pipeline.yaml")
+			}
             echo 'Building the application'
-			sh "dotnet build ${config.projectPath}"
+			echo "building project ${config.projectPath}"
          }
       }
 	  stage('QA') {
